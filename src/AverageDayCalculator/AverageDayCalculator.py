@@ -2,6 +2,7 @@ import base64
 import jira.client
 from collections import defaultdict
 from datetime import datetime as dt
+from datetime import timedelta
 from jira.client import JIRA
 from operator import attrgetter
 import numpy as np
@@ -30,6 +31,14 @@ class CalculateAverageDay:
         self.from_string_list = []
         self.to_string_list = []
         self.total_sum_of_days = 0
+
+
+    def get_new_minimum_date(self,date):
+        start_date = dt.strptime(date,"%Y-%m-%d")
+        return dt.strftime(start_date - timedelta(weeks=13),"%Y-%m-%d")
+
+    def set_new_start_date_in_jql_query(self,query,date):
+        return query[:83] + date + query[93:]
         
     def login_to_jira(self,username,APIKEY,server_options):
         DecodedAPIKey = base64.b64decode(APIKEY)
@@ -108,12 +117,13 @@ class CalculateAverageDay:
         self.to_string_list = file_data['To Statuses']
         self.USERNAME = file_data['Username']
         self.APIKEY =  bytes(file_data['ApiKey'],'utf-8')
-        self.JQL_query= file_data['JQL Query']
+        self.JQL_query = self.set_new_start_date_in_jql_query(file_data['JQL Query'],self.get_new_minimum_date(dt.strftime(dt.today(),"%Y-%m-%d")))
         self.options = file_data['Server Options']
         last_reported_average = file_data['Last Reported Average']
         last_reported_delta = file_data['Last Reported Average Delta']
         average_delta = file_data['Average Delta']
         jira_client = self.login_to_jira(self.USERNAME,self.APIKEY,self.options)
+        
         issueSearchResults = self.get_issues(jira_client,self.JQL_query)
         deltaObjectList = self.get_sorted_list_of_DeltaObject(jira_client,issueSearchResults,self.from_string_list,self.to_string_list)
         sortedDeltaObjectDictionary = self.get_sorted_issue_dictionary(deltaObjectList)
