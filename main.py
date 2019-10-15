@@ -1,10 +1,10 @@
 import json
-import CalculateAverageDay
-from CalculateAverageDay import CalculateAverageDay
 import sys
 import threading
 from PyQt5 import QtWidgets
+from src.AverageDayCalculator.AverageDayCalculator import CalculateAverageDay
 from AverageDaysInTestUI import Ui_Form
+
 
 class mainwindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -22,8 +22,9 @@ class mainwindow(QtWidgets.QMainWindow):
             TestDayAverage = CalculateAverageDay()
             TestDayAverage.Run()
             self.load_average_from_json('TestDayAverageVariables.json')
-        except:
-            self.ui.AverageDaysInTest_int.setText(str('An error accored with updating!'))
+        except Exception as e:
+            self.ui.AverageDaysInTest_int.setText(str('An error occured with updating. Check the console!'))
+            print(e)
     
     def load_average_from_json(self,jsonfile):
         with open(jsonfile) as f:
