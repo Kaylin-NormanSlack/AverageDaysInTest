@@ -121,4 +121,3 @@ class CalculateAverageDay:
         average_delta = self.calculate_average_delta(last_reported_average,average_days)
         self.update_json_file('TestDayAverageVariables.json',file_data,average_days,last_reported_average,last_reported_delta,average_delta,self.total_sum_of_days,sortedDeltaObjectDictionary)
         jira_client.close()
-
